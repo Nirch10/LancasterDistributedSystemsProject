@@ -1,0 +1,44 @@
+version: '3'
+
+networks:
+  scc311coursework:
+
+services:
+  server:
+    container_name: server
+    image: harbor.scc.lancs.ac.uk/$USERNAME/server:latest
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      USERNAME: chodorovn
+    build:
+      context: server
+    networks:
+      - scc311coursework
+    ports:
+      - 8080:8080
+
+  load-balancer:
+    container_name: loadbalancer
+    image: harbor.scc.lancs.ac.uk/$USERNAME/load-balancer:latest
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      USERNAME: chodorovn
+    build:
+      context: loadbalancer
+    networks:
+      - scc311coursework
+    ports:
+      - 9090:8080
+  
+  redis:
+    container_name: redis
+    image: redis:5.0.6
+    restart: unless-stopped
+    networks:
+      - scc311coursework
+    ports:
+      - 6379:6379
